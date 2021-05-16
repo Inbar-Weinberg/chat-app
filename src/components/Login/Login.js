@@ -2,25 +2,20 @@ import { useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { emailSelector } from "../../features/loginState/LoginSlice";
-import firebase, { Auth, useCreateUserWithEmailAndPassword } from "../../app/firebase";
-import styles from "./Register.module.scss";
+import firebase, { Auth, useSignInWithEmailAndPassword } from "../../app/firebase";
+import styles from "./Login.module.scss";
 
-const Register = () => {
-  const [name, setName] = useState("");
+const Login = () => {
+  const [attemptedLogin, setAttemptedLogin] = useState();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [createUserWithEmailAndPassword, userCredentials, loading, error] =
-    useCreateUserWithEmailAndPassword(Auth);
-
+  const [signInWithEmailAndPassword, userCredentials, loading, error] =
+    useSignInWithEmailAndPassword(Auth);
   const history = useHistory();
-  const handleRegister = async () => {
-    try {
-      await createUserWithEmailAndPassword(email, password);
-      await Auth.currentUser.updateProfile({ displayName: name });
-      history.push("/");
-    } catch (e) {
-      console.log(e);
-    }
+
+  const handleLogin = () => {
+    signInWithEmailAndPassword(email, password);
+    setAttemptedLogin(true);
   };
 
   const signInWithGoogle = () => {
@@ -33,6 +28,7 @@ const Register = () => {
   };
 
   if (useSelector(emailSelector)) {
+    if (attemptedLogin) history.push("/");
     return (
       <>
         <h3>There is all ready a user registered</h3>
@@ -56,27 +52,19 @@ const Register = () => {
 
   return (
     <>
-      <div className={styles.register}>
+      <div className={styles.login}>
         <div>
-          <button className={styles.register.signInBtn} disabled>
-            Sign up
-          </button>{" "}
-          <Link to="/login">
-            <button className={styles.register.signInBtn}>Login</button>
+          <Link to="/register">
+            <button className={styles.login.signInBtn}>Sign up</button>
           </Link>
+          <button className={styles.login.signInBtn} disabled>
+            Login
+          </button>
         </div>
-        <form className={styles.register_form}>
-          <input
-            type="text"
-            className={styles.register_input}
-            placeholder="Name"
-            value={name}
-            autoComplete="name"
-            onChange={(e) => setName(e.target.value)}
-          />
+        <form className={styles.login_form}>
           <input
             type="email"
-            className={styles.register_input}
+            className={styles.login_input}
             placeholder="Email@domain.com"
             value={email}
             autoComplete="email"
@@ -84,7 +72,7 @@ const Register = () => {
           />
           <input
             type="password"
-            className={styles.register_input}
+            className={styles.login_input}
             placeholder="Password"
             value={password}
             autoComplete="current-password"
@@ -98,7 +86,7 @@ const Register = () => {
               Sign up with Facebook
             </button>
           </div>
-          <button onClick={handleRegister} className={styles.register_submit}>
+          <button onClick={handleLogin} className={styles.login_submit}>
             Submit
           </button>
         </form>
@@ -107,4 +95,4 @@ const Register = () => {
   );
 };
 
-export { Register };
+export { Login };

@@ -1,0 +1,27 @@
+.login {
+  margin: 1rem auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+}
+.login_form {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+}
+.login_input {
+  width: clamp(300px, 50ch, 50vw);
+  padding: 0.2em 0.5em;
+  margin: 0.4rem auto;
+  box-sizing: border-box;
+  font-size: 1.2rem;
+}
+.login_submit {
+  width: min(75ch, 50%);
+  padding: 0.2em 0.5em;
+  margin: 0.4rem auto;
+  box-sizing: border-box;
+  font-size: 1.2rem;
+}
