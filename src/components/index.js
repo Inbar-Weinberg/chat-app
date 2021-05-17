@@ -1,3 +1,4 @@
 export { Navbar } from "./Navbar/Navbar";
-export { Register } from "./Register/Register";
-export { Login } from "./Login/Login";
+export { Register } from "./Authorization/Register/Register";
+export { Login } from "./Authorization/Login/Login";
+export { Authorization } from "./Authorization/Authorization";

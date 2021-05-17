@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+  loggedIn: false,
   email: undefined,
   displayName: undefined,
+  userUpdateComplete: true,
 };
 
 export const loginSlice = createSlice({
@@ -12,13 +14,20 @@ export const loginSlice = createSlice({
     setUserState: (state, { payload }) => {
       state.email = payload.email;
       state.displayName = payload.displayName;
+      state.loggedIn = !!payload.email;
+    },
+    setUserUpdateComplete: (state, { payload }) => {
+      state.userUpdateComplete = payload.userUpdateComplete;
     },
   },
 });
 
-export const { setUserState } = loginSlice.actions;
+export const { setUserState, setUserUpdateComplete } = loginSlice.actions;
 
+export const userUpdateCompleteSelector = (state) => state.login.userUpdateComplete;
 export const emailSelector = (state) => state.login.email;
 export const displayNameSelector = (state) => state.login.displayName;
+export const loggedInSelector = (state) => state.login.loggedIn;
+
 
 export default loginSlice.reducer;

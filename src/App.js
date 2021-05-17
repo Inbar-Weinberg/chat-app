@@ -1,18 +1,23 @@
 import { Route, Switch } from "react-router-dom";
 import { Auth, useAuthState } from "./app/firebase";
 
-import { useDispatch } from "react-redux";
-import { setUserState } from "./features/loginState/LoginSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setUserState,
+  userUpdateCompleteSelector,
+  displayNameSelector,
+} from "./features/loginState/LoginSlice";
 
-import { Navbar, Register, Login } from "./components";
+import { Navbar, Register, Login, Authorization } from "./components";
 
 import "./App.css";
 
 function App() {
   const dispatch = useDispatch();
   const [user] = useAuthState(Auth);
-
-  if (user) {
+  const displayName = useSelector(displayNameSelector);
+  const userUpdateComplete = useSelector(userUpdateCompleteSelector);
+  if (userUpdateComplete && user) {
     dispatch(setUserState({ email: user.email, displayName: user.displayName }));
     return (
       <>
@@ -20,18 +25,21 @@ function App() {
         <main>
           <Switch>
             <Route path="/" exact>
-              <span>Hello {user.displayName}</span>
+              <span>Hello {displayName}</span>
             </Route>
             <Route path="/chat" exact>
               <div>chat</div>
             </Route>
             <Route path="/register" exact>
-              <Register />
+              <Authorization />
             </Route>
             <Route path="/login" exact>
-              <Login />
+              <Authorization />
             </Route>
-            <Route>NotFound</Route>
+            <Route>
+              <p>404</p>
+              <p>Page NotFound</p>
+            </Route>
           </Switch>
         </main>
         <footer>footer</footer>
@@ -48,12 +56,15 @@ function App() {
               Home
             </Route>
             <Route path="/register" exact>
-              <Register />
+              <Authorization />
             </Route>
             <Route path="/login" exact>
-              <Login />
+              <Authorization />
             </Route>
-            <Route>NotFound</Route>
+            <Route>
+              <p>404</p>
+              <p>Page NotFound</p>
+            </Route>
           </Switch>
         </main>
         <footer>footer</footer>

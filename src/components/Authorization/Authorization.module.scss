@@ -1,0 +1,33 @@
+.component_body {
+  margin: 1rem auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+}
+.form {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+}
+.input {
+  width: clamp(300px, 50ch, 50vw);
+  padding: 0.2em 0.5em;
+  margin: 0.4rem auto;
+  box-sizing: border-box;
+  font-size: 1.2rem;
+}
+.methodBtn{
+
+}
+.signInBtn{
+
+}
+.submitBtn {
+  width: min(75ch, 50%);
+  padding: 0.2em 0.5em;
+  margin: 0.4rem auto;
+  box-sizing: border-box;
+  font-size: 1.2rem;
+}
