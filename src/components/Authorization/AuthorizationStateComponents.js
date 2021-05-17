@@ -2,7 +2,6 @@
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
 import styles from "./Authorization.module.scss";
-export { signInWithExternalAuthCallback } from "./AuthorizationUtils";
 
 export const UserExists = () => {
   return (

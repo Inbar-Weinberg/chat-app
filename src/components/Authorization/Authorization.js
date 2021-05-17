@@ -6,8 +6,8 @@ import { loggedInSelector } from "../../features/loginState/LoginSlice";
 import firebase, { Auth } from "../../app/firebase";
 
 //* components
-import { Register } from "./Register/Register";
-import { Login } from "./Login/Login";
+import { Register } from "./Register";
+import { Login } from "./Login";
 
 import {
   ErrorOnAuthorization,
@@ -25,6 +25,7 @@ export const Authorization = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const registerSucceeded = useRef(true);
+  const uploadUserSucceeded = useRef(true);
 
   const signInWithExternalAuth = async ({ externalServiceName }) => {
     const provider = new firebase.auth[`${externalServiceName}AuthProvider`]();
@@ -52,6 +53,7 @@ export const Authorization = () => {
     loggedInSelector,
     Auth,
     registerSucceeded,
+    uploadUserSucceeded,
   };
   if (pathname.toLowerCase() === "/login") return <Login {...props} />;
 

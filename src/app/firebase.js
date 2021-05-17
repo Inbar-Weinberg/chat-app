@@ -19,7 +19,9 @@ export {
   useSignInWithEmailAndPassword,
 } from "react-firebase-hooks/auth";
 
+export const { FieldValue } = firebase;
 export const Firestore = app.firestore();
+console.log({ Firestore });
 export const Auth = app.auth();
 export { app };
 export default firebase;

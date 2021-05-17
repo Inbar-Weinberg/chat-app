@@ -1,4 +1,4 @@
-import { useSignInWithEmailAndPassword } from "../../../app/firebase";
+import { useSignInWithEmailAndPassword } from "../../app/firebase";
 
 export const Login = ({
   signInWithExternalAuth,

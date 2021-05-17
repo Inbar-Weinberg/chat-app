@@ -1,3 +1,5 @@
+import { createGroup } from "./app/groupData";
+
 import { Route, Switch } from "react-router-dom";
 import { Auth, useAuthState } from "./app/firebase";
 
@@ -8,7 +10,7 @@ import {
   displayNameSelector,
 } from "./features/loginState/LoginSlice";
 
-import { Navbar, Register, Login, Authorization } from "./components";
+import { Navbar, Authorization } from "./components";
 
 import "./App.css";
 
@@ -19,10 +21,16 @@ function App() {
   const userUpdateComplete = useSelector(userUpdateCompleteSelector);
   if (userUpdateComplete && user) {
     dispatch(setUserState({ email: user.email, displayName: user.displayName }));
+
+    const test = async () => {
+      createGroup({ userId: user.uid, groupName: "Some Group", privateGroup: false });
+    };
+
     return (
       <>
         <Navbar />
         <main>
+          <button onClick={test}>test</button>
           <Switch>
             <Route path="/" exact>
               <span>Hello {displayName}</span>

@@ -3,9 +3,9 @@ import { useState } from "react";
 import {
   setUserState,
   setUserUpdateComplete,
-} from "../../../features/loginState/LoginSlice";
-import { useCreateUserWithEmailAndPassword } from "../../../app/firebase";
-import { saveUserToFirestore } from "../../../app/usersData";
+} from "../../features/loginState/LoginSlice";
+import { useCreateUserWithEmailAndPassword } from "../../app/firebase";
+import { saveUserToFirestore } from "../../app/userData";
 
 export const Register = ({
   signInWithExternalAuth,
@@ -26,14 +26,15 @@ export const Register = ({
   loggedInSelector,
   Auth,
   registerSucceeded,
+  uploadUserSucceeded,
 }) => {
   const [photoURL, setPhotoURL] = useState("not available");
+  const [errorOnUserUpload, setErrorOnUserUpload] = useState();
   const [displayName, setDisplayName] = useState("");
   const [createUserWithEmailAndPassword, userCredentials, loading, error] =
     useCreateUserWithEmailAndPassword(Auth);
 
   const isLoggedIn = useSelector(loggedInSelector);
-
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -48,18 +49,21 @@ export const Register = ({
       */
       await Auth.currentUser.updateProfile({ displayName, photoURL });
       //* will throw error here if the user was not created successfully
+      registerSucceeded.current = true;
 
       dispatch(setUserState({ email, displayName }));
       await saveUserToFirestore(Auth.currentUser);
       dispatch(setUserUpdateComplete({ userUpdateComplete: true }));
-      registerSucceeded.current = true;
+
       history.push("/");
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      if (registerSucceeded.current) setErrorOnUserUpload(err);
+      else console.log(err);
     }
   };
 
-  if (error) return <ErrorOnAuthorization error={error} />;
+  if (error || errorOnUserUpload)
+    return <ErrorOnAuthorization error={error || errorOnUserUpload} />;
   if (loading || !registerSucceeded.current) return <Loading />;
   if (isLoggedIn) return <UserExists />;
 
