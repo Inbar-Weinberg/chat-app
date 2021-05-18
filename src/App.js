@@ -32,7 +32,7 @@ function App() {
               <span>Hello {displayName}</span>
             </Route>
             <Route path="/chat" exact>
-              <Chat />
+              <Chat/>
             </Route>
             <Route path="/register" exact>
               <Authorization />

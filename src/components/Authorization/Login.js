@@ -42,7 +42,6 @@ export const Login = ({
 
   if (userCredentials && !isLoggedIn) {
     const { user } = userCredentials;
-    console.log(user);
     dispatch(
       setUserState({ email: user.email, displayName: user.displayName, uid: user.uid })
     );

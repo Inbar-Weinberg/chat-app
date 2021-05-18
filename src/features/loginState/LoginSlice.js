@@ -16,7 +16,7 @@ export const loginSlice = createSlice({
     setUserState: (state, { payload }) => {
       state.email = payload.email;
       state.displayName = payload.displayName;
-      state.uid = payload.userId;
+      state.uid = payload.uid;
       state.loggedIn = !!payload.email;
     },
     setUserUpdateComplete: (state, { payload }) => {
