@@ -1,54 +1,67 @@
 import { useSignInWithEmailAndPassword } from "../../app/firebase";
 
 export const Login = ({
+  //* functions
   signInWithExternalAuth,
   history,
+  //* local state
   email,
   setEmail,
   password,
   setPassword,
+  //* refs
+  pendingAuthorizationTasks,
+  //*components
   ErrorOnAuthorization,
   UserExists,
   Loading,
   InputPassword,
   InputEmail,
   Form,
+  //* state management
+  dispatch,
   useSelector,
   loggedInSelector,
+  setUserState,
+  setUserUpdateComplete,
+  //* firebase
   Auth,
-  registerSucceeded,
 }) => {
-  const [signInWithEmailAndPassword, userCredentials, loading, error] =
+  const [signInWithEmailAndPassword, userCredentials, loading, errorAuthorizingUser] =
     useSignInWithEmailAndPassword(Auth);
 
   const isLoggedIn = useSelector(loggedInSelector);
-
   const handleLogin = async (e) => {
     e.preventDefault();
-    registerSucceeded.current = false;
-    try {
-      await signInWithEmailAndPassword(email, password);
-      console.log(Auth.currentUser);
-      if (Auth.currentUser) {
-        registerSucceeded.current = true;
-        history.push("/");
-      }
-    } catch (e) {
-      console.log(e);
-    }
+    pendingAuthorizationTasks.current = true;
+    dispatch(setUserUpdateComplete({ userUpdateComplete: false }));
+    await signInWithEmailAndPassword(email, password);
   };
 
-  if (error) return <ErrorOnAuthorization error={error} />;
-  if (loading || !registerSucceeded.current) return <Loading />;
-  if (isLoggedIn) return <UserExists />;
+  if (isLoggedIn && !pendingAuthorizationTasks.current) return <UserExists />;
 
-  return (
-    <Form
-      handleSubmit={handleLogin}
-      role={"Login"}
-      signInWithExternalAuth={signInWithExternalAuth}>
-      <InputEmail value={email} setFunction={setEmail} />
-      <InputPassword value={password} setFunction={setPassword} />
-    </Form>
-  );
+  if (userCredentials && !isLoggedIn) {
+    const { user } = userCredentials;
+    console.log(user);
+    dispatch(
+      setUserState({ email: user.email, displayName: user.displayName, uid: user.uid })
+    );
+    dispatch(setUserUpdateComplete({ userUpdateComplete: true }));
+    pendingAuthorizationTasks.current = false;
+    history.push("/");
+  }
+
+  if (errorAuthorizingUser) return <ErrorOnAuthorization error={errorAuthorizingUser} />;
+  if (loading || pendingAuthorizationTasks.current) return <Loading />;
+
+  if (!pendingAuthorizationTasks.current)
+    return (
+      <Form
+        handleSubmit={handleLogin}
+        role={"Login"}
+        signInWithExternalAuth={signInWithExternalAuth}>
+        <InputEmail value={email} setFunction={setEmail} />
+        <InputPassword value={password} setFunction={setPassword} />
+      </Form>
+    );
 };

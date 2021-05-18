@@ -2,7 +2,11 @@
 import { useState, useRef } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { loggedInSelector } from "../../features/loginState/LoginSlice";
+import {
+  loggedInSelector,
+  setUserState,
+  setUserUpdateComplete,
+} from "../../features/loginState/LoginSlice";
 import firebase, { Auth } from "../../app/firebase";
 
 //* components
@@ -16,6 +20,7 @@ import {
   InputPassword,
   InputName,
   InputEmail,
+  InputPhotoURL,
   Form,
 } from "./AuthorizationStateComponents";
 
@@ -24,8 +29,9 @@ export const Authorization = () => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const registerSucceeded = useRef(true);
-  const uploadUserSucceeded = useRef(true);
+  const pendingAuthorizationTasks = useRef(false);
+
+  //console.log("pendingAuthorizationTasks.current", pendingAuthorizationTasks.current);
 
   const signInWithExternalAuth = async ({ externalServiceName }) => {
     const provider = new firebase.auth[`${externalServiceName}AuthProvider`]();
@@ -35,26 +41,35 @@ export const Authorization = () => {
 
   const { pathname } = useLocation();
   const props = {
+    //* functions
     signInWithExternalAuth,
     history,
-    dispatch,
+    //* local state
     email,
     setEmail,
     password,
     setPassword,
+    //* refs
+    pendingAuthorizationTasks,
+    //*components
     ErrorOnAuthorization,
     UserExists,
     Loading,
     InputPassword,
     InputName,
     InputEmail,
+    InputPhotoURL,
     Form,
+    //* state management
+    dispatch,
     useSelector,
     loggedInSelector,
+    setUserState,
+    setUserUpdateComplete,
+    //* firebase
     Auth,
-    registerSucceeded,
-    uploadUserSucceeded,
   };
+
   if (pathname.toLowerCase() === "/login") return <Login {...props} />;
 
   if (pathname.toLowerCase() === "/register") return <Register {...props} />;

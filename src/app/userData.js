@@ -1,10 +1,9 @@
-import { Firestore } from "./firebase";
+import firebase, { Firestore } from "./firebase";
 
 async function saveUserToFirestore(user) {
-
-  const userRef = Firestore.collection("user");
+  const userRef = Firestore.collection("users");
   await userRef.doc(user.uid).set({
-    createdAt: Firestore.Timestamp.now(),
+    createdAt: firebase.firestore.Timestamp.now(),
     uid: user.uid,
     displayName: user.displayName,
     photoURL: user.photoURL,
@@ -13,6 +12,6 @@ async function saveUserToFirestore(user) {
   });
 }
 
-export { saveUserToFirestore };
 
-//admin.firestore.Timestamp.fromDate(new Date('December 10, 1815'))
+
+export { saveUserToFirestore };

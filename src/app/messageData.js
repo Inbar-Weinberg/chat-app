@@ -1,10 +1,10 @@
-import { Firestore } from "./firebase";
+import firebase, { Firestore } from "./firebase";
 
-export async function createMessage({ userId, groupId, messageText }) {
-  const groupRef = Firestore.collection("message");
+export async function createMessage({ uid, groupId, messageText }) {
+  const groupRef = Firestore.collection("messages");
   await groupRef.doc(groupId).set({
-    createdAt: Firestore.Timestamp.now(),
-    sentBy: userId,
+    createdAt: firebase.firestore.Timestamp.now(),
+    sentBy: uid,
     messageText,
   });
 }

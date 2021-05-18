@@ -1,5 +1,3 @@
-import { createGroup } from "./app/groupData";
-
 import { Route, Switch } from "react-router-dom";
 import { Auth, useAuthState } from "./app/firebase";
 
@@ -10,33 +8,31 @@ import {
   displayNameSelector,
 } from "./features/loginState/LoginSlice";
 
-import { Navbar, Authorization } from "./components";
+import { Navbar, Authorization, Chat } from "./components";
 
 import "./App.css";
 
 function App() {
   const dispatch = useDispatch();
   const [user] = useAuthState(Auth);
+
   const displayName = useSelector(displayNameSelector);
   const userUpdateComplete = useSelector(userUpdateCompleteSelector);
   if (userUpdateComplete && user) {
-    dispatch(setUserState({ email: user.email, displayName: user.displayName }));
-
-    const test = async () => {
-      createGroup({ userId: user.uid, groupName: "Some Group", privateGroup: false });
-    };
+    dispatch(
+      setUserState({ email: user.email, displayName: user.displayName, uid: user.uid })
+    );
 
     return (
       <>
         <Navbar />
         <main>
-          <button onClick={test}>test</button>
           <Switch>
             <Route path="/" exact>
               <span>Hello {displayName}</span>
             </Route>
             <Route path="/chat" exact>
-              <div>chat</div>
+              <Chat />
             </Route>
             <Route path="/register" exact>
               <Authorization />
@@ -54,7 +50,9 @@ function App() {
       </>
     );
   } else {
-    dispatch(setUserState({ email: undefined, displayName: undefined }));
+    dispatch(
+      setUserState({ email: undefined, displayName: undefined, userId: undefined })
+    );
     return (
       <>
         <Navbar />

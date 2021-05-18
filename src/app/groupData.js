@@ -1,18 +1,31 @@
 //
-import firebase,{ Firestore }  from "./firebase";
+import firebase, { Firestore } from "./firebase";
 //import  { firestore as Firestore } from "firebase-admin";
 
-export async function createGroup({ userId, groupName, privateGroup = true }) {
+async function createGroup({ uid, groupName, privateGroup = true }) {
   const groupRef = Firestore.collection("groups");
-  console.log(Firestore);
-  console.log(Object.keys(Firestore));
   await groupRef.add({
-    createdAt: Firestore.Timestamp.now(),
-    createdBy: userId,
+    createdAt: firebase.firestore.Timestamp.now(),
+    createdBy: uid,
     name: groupName,
     privateGroup,
-    members: [userId],
+    members: [uid],
     lastMessage: "",
     photoURL: "",
   });
 }
+
+async function addUserToGroup({ groupId, uid }) {
+  const groupRef = Firestore.collection("groups").doc(groupId);
+  await groupRef.update({
+    updatedAt: firebase.firestore.Timestamp.now(),
+    members: firebase.firestore.FieldValue.arrayUnion(uid),
+  });
+  const userRef = Firestore.collection("users").doc(uid);
+  await userRef.update({
+    updatedAt: firebase.firestore.Timestamp.now(),
+    members: firebase.firestore.FieldValue.arrayUnion(uid),
+  });
+}
+
+export { createGroup, addUserToGroup };

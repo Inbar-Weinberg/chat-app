@@ -2,7 +2,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 
-const app = firebase.initializeApp({
+const App = firebase.initializeApp({
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
@@ -19,9 +19,9 @@ export {
   useSignInWithEmailAndPassword,
 } from "react-firebase-hooks/auth";
 
-export const { FieldValue } = firebase;
-export const Firestore = app.firestore();
-console.log({ Firestore });
-export const Auth = app.auth();
-export { app };
+export { useDocumentData } from "react-firebase-hooks/firestore";
+
+export const Firestore = App.firestore();
+export const Auth = App.auth();
+export { App };
 export default firebase;

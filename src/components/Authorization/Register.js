@@ -1,80 +1,86 @@
 //* hooks and modules
 import { useState } from "react";
-import {
-  setUserState,
-  setUserUpdateComplete,
-} from "../../features/loginState/LoginSlice";
+
 import { useCreateUserWithEmailAndPassword } from "../../app/firebase";
 import { saveUserToFirestore } from "../../app/userData";
 
 export const Register = ({
+  //* functions
   signInWithExternalAuth,
   history,
-  dispatch,
+  //* local state
   email,
   setEmail,
   password,
   setPassword,
+  //* refs
+  pendingAuthorizationTasks,
+  //*components
   ErrorOnAuthorization,
   UserExists,
   Loading,
   InputPassword,
   InputName,
   InputEmail,
+  InputPhotoURL,
   Form,
+  //* state management
+  dispatch,
   useSelector,
   loggedInSelector,
+  setUserState,
+  setUserUpdateComplete,
+  //* firebase
   Auth,
-  registerSucceeded,
-  uploadUserSucceeded,
 }) => {
-  const [photoURL, setPhotoURL] = useState("not available");
-  const [errorOnUserUpload, setErrorOnUserUpload] = useState();
+  const [photoURL, setPhotoURL] = useState("");
+  const [errorSavingToFirestore, setErrorSavingToFirestore] = useState();
   const [displayName, setDisplayName] = useState("");
-  const [createUserWithEmailAndPassword, userCredentials, loading, error] =
+  const [createUserWithEmailAndPassword, userCredentials, loading, errorAuthorizingUser] =
     useCreateUserWithEmailAndPassword(Auth);
 
   const isLoggedIn = useSelector(loggedInSelector);
-
   const handleRegister = async (e) => {
     e.preventDefault();
-    registerSucceeded.current = false;
+    pendingAuthorizationTasks.current = true;
     dispatch(setUserUpdateComplete({ userUpdateComplete: false }));
-    try {
-      await createUserWithEmailAndPassword(email, password);
-      /* 
-      ! this will activate the "useAuthState" in App.js, causing a reRender
-      ! of the App component before completing the user update, cause miss match
-      ! in login.slice state. 
-      */
-      await Auth.currentUser.updateProfile({ displayName, photoURL });
-      //* will throw error here if the user was not created successfully
-      registerSucceeded.current = true;
-
-      dispatch(setUserState({ email, displayName }));
-      await saveUserToFirestore(Auth.currentUser);
-      dispatch(setUserUpdateComplete({ userUpdateComplete: true }));
-
-      history.push("/");
-    } catch (err) {
-      if (registerSucceeded.current) setErrorOnUserUpload(err);
-      else console.log(err);
-    }
+    await createUserWithEmailAndPassword(email, password);
   };
 
-  if (error || errorOnUserUpload)
-    return <ErrorOnAuthorization error={error || errorOnUserUpload} />;
-  if (loading || !registerSucceeded.current) return <Loading />;
-  if (isLoggedIn) return <UserExists />;
+  if (isLoggedIn && !pendingAuthorizationTasks.current) return <UserExists />;
 
-  return (
-    <Form
-      handleSubmit={handleRegister}
-      role={"Register"}
-      signInWithExternalAuth={signInWithExternalAuth}>
-      <InputName value={displayName} setFunction={setDisplayName} />
-      <InputEmail value={email} setFunction={setEmail} />
-      <InputPassword value={password} setFunction={setPassword} />
-    </Form>
-  );
+  if (userCredentials && !isLoggedIn) {
+    const { user } = userCredentials;
+    user
+      .updateProfile({ displayName, photoURL })
+      .then(() => saveUserToFirestore(user))
+      .catch((err) => setErrorSavingToFirestore(err))
+
+      .then(() => {
+        dispatch(setUserState({ email: user.email, displayName: user.displayName,uid:user.uid}));
+        dispatch(setUserUpdateComplete({ userUpdateComplete: true }));
+      })
+      .then(() => (pendingAuthorizationTasks.current = false))
+      .then(() => history.push("/"));
+  }
+
+  if (errorAuthorizingUser || errorSavingToFirestore)
+    return (
+      <ErrorOnAuthorization error={errorAuthorizingUser || errorSavingToFirestore} />
+    );
+
+  if (loading || pendingAuthorizationTasks.current) return <Loading />;
+
+  if (!pendingAuthorizationTasks.current)
+    return (
+      <Form
+        handleSubmit={handleRegister}
+        role={"Register"}
+        signInWithExternalAuth={signInWithExternalAuth}>
+        <InputName value={displayName} setFunction={setDisplayName} />
+        <InputEmail value={email} setFunction={setEmail} />
+        <InputPassword value={password} setFunction={setPassword} />
+        <InputPhotoURL value={photoURL} setFunction={setPhotoURL} />
+      </Form>
+    );
 };

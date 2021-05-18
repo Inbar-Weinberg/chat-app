@@ -111,3 +111,16 @@ export const InputEmail = ({ value, setFunction }) => {
     />
   );
 };
+
+export const InputPhotoURL = ({ value, setFunction }) => {
+  return (
+    <input
+      className={styles.input}
+      type="text"
+      placeholder="Photo URL"
+      autoComplete="Photo URL"
+      value={value}
+      onChange={(e) => setFunction(e.target.value)}
+    />
+  );
+};
