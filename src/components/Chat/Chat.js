@@ -1,7 +1,16 @@
 import { useState } from "react";
-import { createGroup, addUserToGroup } from "../../app/groupData";
 import { useSelector } from "react-redux";
-import { uidSelector, displayNameSelector } from "../../features/loginState/LoginSlice";
+import {
+  uidSelector,
+  displayNameSelector,
+  photoURLSelector,
+} from "../../features/loginState/LoginSlice";
+//* Data base Api
+import {
+  createGroup,
+  addUserToGroup,
+  createPrivateConversation,
+} from "../../app/groupApi";
 //* components
 import { ActiveGroups } from "./ActiveGroups";
 //* styles
@@ -10,18 +19,20 @@ import styles from "./Chat.module.scss";
 const Chat = () => {
   const uid = useSelector(uidSelector);
   const displayName = useSelector(displayNameSelector);
+  const photoURL = useSelector(photoURLSelector);
 
   const [groupName, setGroupName] = useState("");
-  const [userEmail, setUserEmail] = useState("");
+  const [partnersEmail, setPartnersEmail] = useState("");
   const [groupId, setGroupId] = useState("");
 
-  const createNewGroup = async (e) => {
+  const createGroupHandler = async (e) => {
     e.preventDefault();
-    await createGroup({ uid, displayName, groupName, privateGroup: false });
+    await createGroup({ uid, displayName }, groupName);
   };
 
-  const createPrivateGroup = async () => {
-    createGroup({ uid: uid, groupName: "Some Group", privateGroup: true });
+  const createPrivateConversationHandler = async (e) => {
+    e.preventDefault();
+    await createPrivateConversation({ uid, displayName, photoURL }, partnersEmail);
   };
 
   return (
@@ -37,18 +48,21 @@ const Chat = () => {
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
           />
-          <button onClick={createNewGroup}>Create New Group</button>
+          <button onClick={createGroupHandler}>Create New Group</button>
         </div>
-
+        <br />
         <div>
           <input
             type="text"
-            placeholder="User I.D"
-            value={userEmail}
-            onChange={(e) => setUserEmail(e.target.value)}
+            placeholder="User Email"
+            value={partnersEmail}
+            onChange={(e) => setPartnersEmail(e.target.value)}
           />
-          <button onClick={createPrivateGroup}>Start New conversation</button>
+          <button onClick={createPrivateConversationHandler}>
+            Start New conversation
+          </button>
         </div>
+        <br />
 
         <div>
           <input
@@ -57,7 +71,9 @@ const Chat = () => {
             value={groupId}
             onChange={(e) => setGroupId(e.target.value)}
           />
-          <button onClick={() => addUserToGroup({ groupId, uid })}>Join group</button>
+          <button onClick={() => addUserToGroup({ groupId, uid })}>
+            Join group
+          </button>
         </div>
       </form>
     </div>

@@ -1,9 +1,10 @@
+
 import React from "react";
 //* state management
 import { useSelector } from "react-redux";
 import { uidSelector } from "../../features/loginState/LoginSlice";
 //* firebase
-import firebase, { Firestore, useDocumentData } from "../../app/firebase";
+import { Firestore, useDocumentData } from "../../app/firebase";
 
 const ActiveGroups = () => {
   const uid = useSelector(uidSelector);

@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 import { useCreateUserWithEmailAndPassword } from "../../app/firebase";
-import { saveUserToFirestore } from "../../app/userData";
+import { saveUserToFirestore } from "../../app/userApi";
 
 export const Register = ({
   //* functions
@@ -33,11 +33,18 @@ export const Register = ({
   //* firebase
   Auth,
 }) => {
+  const DEFAULT_PHOTO =
+    "https://thumbs.dreamstime.com/b/default-avatar-profile-trendy-style-social-media-user-icon-187599373.jpg";
+
   const [photoURL, setPhotoURL] = useState("");
   const [errorSavingToFirestore, setErrorSavingToFirestore] = useState();
   const [displayName, setDisplayName] = useState("");
-  const [createUserWithEmailAndPassword, userCredentials, loading, errorAuthorizingUser] =
-    useCreateUserWithEmailAndPassword(Auth);
+  const [
+    createUserWithEmailAndPassword,
+    userCredentials,
+    loading,
+    errorAuthorizingUser,
+  ] = useCreateUserWithEmailAndPassword(Auth);
 
   const isLoggedIn = useSelector(loggedInSelector);
   const handleRegister = async (e) => {
@@ -52,12 +59,19 @@ export const Register = ({
   if (userCredentials && !isLoggedIn) {
     const { user } = userCredentials;
     user
-      .updateProfile({ displayName, photoURL })
+      .updateProfile({ displayName, photoURL: photoURL || DEFAULT_PHOTO })
       .then(() => saveUserToFirestore(user))
       .catch((err) => setErrorSavingToFirestore(err))
 
       .then(() => {
-        dispatch(setUserState({ email: user.email, displayName: user.displayName,uid:user.uid}));
+        dispatch(
+          setUserState({
+            email: user.email,
+            displayName: user.displayName,
+            uid: user.uid,
+            photoURL: photoURL || DEFAULT_PHOTO,
+          })
+        );
         dispatch(setUserUpdateComplete({ userUpdateComplete: true }));
       })
       .then(() => (pendingAuthorizationTasks.current = false))

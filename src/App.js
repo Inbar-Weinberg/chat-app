@@ -6,6 +6,7 @@ import {
   setUserState,
   userUpdateCompleteSelector,
   displayNameSelector,
+  photoURLSelector,
 } from "./features/loginState/LoginSlice";
 
 import { Navbar, Authorization, Chat } from "./components";
@@ -18,9 +19,16 @@ function App() {
 
   const displayName = useSelector(displayNameSelector);
   const userUpdateComplete = useSelector(userUpdateCompleteSelector);
+  const photoURL = useSelector(photoURLSelector);
+  console.log(photoURL);
   if (userUpdateComplete && user) {
     dispatch(
-      setUserState({ email: user.email, displayName: user.displayName, uid: user.uid })
+      setUserState({
+        email: user.email,
+        displayName: user.displayName,
+        uid: user.uid,
+        photoURL: user.photoURL,
+      })
     );
 
     return (
@@ -30,9 +38,10 @@ function App() {
           <Switch>
             <Route path="/" exact>
               <span>Hello {displayName}</span>
+              <img src={photoURL} alt="default" />
             </Route>
             <Route path="/chat" exact>
-              <Chat/>
+              <Chat />
             </Route>
             <Route path="/register" exact>
               <Authorization />
